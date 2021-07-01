@@ -1,0 +1,7 @@
+# Project exclude paths
+/zshop-backend-web/target/
+/zshop-common/target/
+/zshop-dao/target/
+/zshop-front-web/target/
+/zshop-pojo/target/
+/zshop-service/target/

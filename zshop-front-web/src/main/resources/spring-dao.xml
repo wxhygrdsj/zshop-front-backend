@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--IOC bean的扫描-->
+    <!--<context:component-scan base-package="com.zte.zshop.service.impl"/>-->
+    <!--<context:component-scan base-package="com.zte.zshop.dao"/>-->
+
+
+    <!--aop事务  数据源整合-->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:datasource.properties</value>
+                <value>classpath:ftp.properties</value>
+            </list>
+
+        </property>
+
+    </bean>
+    <!--配置数据源属性文件-->
+    <!--<context:property-placeholder location="classpath:datasource.properties"/>-->
+
+    <!--配置数据源-->
+    <bean id="ds" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="initialSize" value="${jdbc.initialSize}"/>
+    </bean>
+
+
+
+    <!--spring  mybatis整合
+    spring和持久层的整合其实就是将核心类交给spring管理
+    -->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--指定数据源-->
+        <property name="dataSource" ref="ds"/>
+        <!--指定别名包-->
+        <property name="typeAliasesPackage" value="com.zte.zshop.entity"/>
+        <!--注册mapper映射文件-->
+        <property name="mapperLocations" value="classpath:com/zte/zshop/mapper/*Mapper.xml"/>
+        <!--mybatis分页插件-->
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <props>
+                            <prop key="helperDialect">mysql</prop>
+                            
+                        </props>
+
+                    </property>
+
+                </bean>
+
+            </array>
+
+        </property>
+
+
+
+
+    </bean>
+
+    <!--dao被spring进行管理
+    mapper对应的dao-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.zte.zshop.dao"/>
+
+    </bean>
+
+
+
+
+
+</beans>
