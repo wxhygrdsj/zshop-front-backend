@@ -151,7 +151,7 @@
                                 <div class="user clearfix pull-right">
                                     ￥${product.price}
                                 </div>
-                                <div class="desc">平时穿也不会显得夸张，很大方洋气 我已经自留了，还和小姐妹准备人手一件圣诞节穿着出去玩！ 经典的圆领，大气休闲，长袖设计，休闲舒适 宽松的版型，怕冷可以里面穿保暖衣）
+                                <div class="desc">${product.info}
                                 </div>
                                 <div class="attention pull-right" onclick="addToCart(${product.id})">
                                     加入购物车 <i class="icon iconfont icon-gouwuche"></i>

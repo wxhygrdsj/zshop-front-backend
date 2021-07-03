@@ -39,5 +39,33 @@
 
     </select>
 
+    <!--
+    public Customer selectByName(String loginName);
+    -->
+    <select id="selectByName" resultType="customer">
+        SELECT
+          login_name loginName,is_valid isValid
+        FROM
+          t_customer
+        where
+          login_name=#{loginName}
+
+    </select>
+
+<!--    public void insert(Customer customer);-->
+    <insert id="insert" parameterType="customer">
+        INSERT INTO t_customer ( NAME, login_name, PASSWORD, phone, address, is_valid, regist_date )
+VALUES
+	(
+		#{name},
+		#{loginName},
+		#{password},
+		#{phone},
+		#{address},
+	    #{isValid},
+        #{registDate})
+
+    </insert>
+
 
 </mapper>

@@ -141,6 +141,8 @@ public class ProductController {
         is.close();
         bos.flush();
         bos.close();
+
+
     }
 
     //修改商品

@@ -101,9 +101,6 @@ public class SysuserController {
             map.put("valid",false);
             map.put("message","账号【"+loginName+"】已经存在");
         }
-
-
-
         return map;
     }
 

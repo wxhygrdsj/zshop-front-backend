@@ -10,4 +10,8 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface CustomerDao {
     public Customer selectByLoginNameAndPass(@Param("loginName") String loginName, @Param("password") String password, @Param("isValid") Integer isValid);
+
+    public Customer selectByName(String loginName);
+
+    public void insert(Customer customer);
 }

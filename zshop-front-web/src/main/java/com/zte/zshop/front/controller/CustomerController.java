@@ -4,12 +4,15 @@ import com.zte.zshop.entity.Customer;
 import com.zte.zshop.exception.LoginErrorException;
 import com.zte.zshop.service.CustomerService;
 import com.zte.zshop.utils.ResponseResult;
+import com.zte.zshop.vo.CustomerVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Author:helloboy
@@ -28,9 +31,12 @@ public class CustomerController {
     @RequestMapping("/loginByAccount")
     @ResponseBody
     public ResponseResult loginByAccount(String loginName, String password, HttpSession session){
-
+        if(loginName.isEmpty()||password.isEmpty()){
+            return ResponseResult.fail("登录失败");
+        }
         try {
             Customer customer= customerService.login(loginName,password);
+
             session.setAttribute("customer",customer);
             return ResponseResult.success(customer);
         } catch (LoginErrorException e) {
@@ -53,4 +59,60 @@ public class CustomerController {
         return ResponseResult.success("退出成功");
 
     }
+
+    //注册
+    //@RequestMapping("loginIn")
+    //@ResponseBody
+    //public ResponseResult loginIn(HttpSession session){
+    //
+    //}
+
+
+    @RequestMapping("/checkName")
+    @ResponseBody
+    public Map<String,Object> checkName(String loginName){
+        //System.out.println(loginName);
+        Map<String,Object> map = new HashMap<>();
+        boolean res=customerService.checkName(loginName);
+        //如果名称不存在，可用
+        if(res){
+            map.put("valid",true);
+        }
+        else{
+            map.put("valid",false);
+            map.put("message","账号【"+loginName+"】已经存在");
+        }
+        return map;
+    }
+
+    @RequestMapping("/add")
+    @ResponseBody
+    public ResponseResult add(CustomerVO sysuserVO){
+
+        try {
+            customerService.add(sysuserVO);
+            return ResponseResult.success("注册成功");
+        } catch (Exception e) {
+            //e.printStackTrace();
+            return ResponseResult.fail("注册失败");
+        }
+    }
+
+
+    //@RequestMapping("/loginIn")
+    //@ResponseBody
+    //public Map<String,Object> checkName(String loginName){
+    //    //System.out.println(loginName);
+    //    Map<String,Object> map = new HashMap<>();
+    //    boolean res=customerService.checkName(loginName);
+    //    //如果名称不存在，可用
+    //    if(res){
+    //        map.put("valid",true);
+    //    }
+    //    else{
+    //        map.put("valid",false);
+    //        map.put("message","账号【"+loginName+"】已经存在");
+    //    }
+    //    return map;
+    //}
 }

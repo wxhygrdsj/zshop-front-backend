@@ -50,7 +50,7 @@ public class SysuserServiceImpl implements SysuserService {
 
         Sysuser sysuser = new Sysuser();
         try {
-            PropertyUtils.copyProperties(sysuser,sysuserVO);
+            PropertyUtils.copyProperties(sysuser,sysuserVO);//
             //默认为有效状态
             sysuser.setIsValid(Constant.SYSUSER_VALID);
             //默认响应时间就是当前时间

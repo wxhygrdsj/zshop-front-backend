@@ -79,7 +79,7 @@ public class ProductController {
         byte[] data = new byte[4096];
         int size=0;
         size = is.read(data);
-        while(size!=1){
+        while(size!=-1){
             bos.write(data,0,size);
             size=is.read(data);
         }

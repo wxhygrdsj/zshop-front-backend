@@ -41,6 +41,7 @@
     <mvc:resources mapping="/js/**" location="/WEB-INF/js/"/>
     <mvc:resources mapping="/fonts/**" location="/WEB-INF/fonts/"/>
     <mvc:resources mapping="/layer/**" location="/WEB-INF/layer/"/>
+    <mvc:resources mapping="/iconfont/**" location="/WEB-INF/iconfont/"/>
 
     <!--文件上传
     注意点：

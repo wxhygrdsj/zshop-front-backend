@@ -4,8 +4,12 @@
 <head>
     <title></title>
     <script src="${pageContext.request.contextPath}/js/template.js"></script>
+<%--    <script src="${pageContext.request.contextPath}/js/jquery.js"></script>--%>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrapValidator.min.css"/>
+    <script src="${pageContext.request.contextPath}/js/bootstrapValidator.min.js"></script>
+    <script src="${pageContext.request.contextPath}/layer/layer.js"></script>
     <script>
-        $(function () {
+        function checkForm(){
             var curIndex=${requestScope.index};
             $('ul.nav li').each(function (i) {
                 $(this).removeClass('active');
@@ -13,7 +17,102 @@
                     $(this).addClass('active');
                 }
             });
-        });
+            $('#frmloginin').bootstrapValidator({
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok',//成功后输出的图标
+                    invalid: 'glyphicon glyphicon-remove',//失败后输出的图标
+                    validating: 'glyphicon glyphicon-refresh'//长时间加载时输出的图标
+                },
+                fields:{
+                    cusname: {
+                        validators: {
+                            notEmpty: {
+                                message: '用户名不能为空'
+                            },
+                            stringLength:{
+                                min:4,
+                                max:12,
+                                message:'用户名长度必须在4-12位之间'
+                            }
+                        }
+                    },
+                    loginName:{
+                        validators:{
+                            notEmpty:{
+                                message:'登录名不能为空'
+                            },
+                            stringLength:{
+                                min:4,
+                                max:12,
+                                message:'登录名长度必须在4-12位之间'
+                            },
+                            remote:{
+                                //校验该名称是否已经在数据库中存在
+                                url:'${pageContext.request.contextPath}/front/customer/checkName'
+                            }
+                        }
+                    },
+                    password:{
+                        validators: {
+                            notEmpty: {
+                                message:'密码不能为空'
+                            },
+                            stringLength: {
+                                min:4,
+                                message:'密码至少为4位'
+                            },
+                            different:{
+                                field:'login_name',
+                                message:'密码不能和登录名相同'
+                            },
+                            identical:{
+                                field: 'confirmpassword',
+                                message:'两次输入密码不一致'
+                            }
+                        }
+                    },
+                    confirmpassword:{
+                        validators:{
+                            notEmpty:{
+                                message:'密码不能为空'
+                            },
+                            identical:{
+                                field: 'password',
+                                message:'两次输入密码不一致'
+                            }
+                        }
+                    },
+                    phone:{
+                        validators:{
+                            notEmpty:{
+                                message:'电话不能为空'
+                            },
+                            regexp:{
+                                regexp: /^1\d{10}$/,
+                                message:'手机号格式错误'
+                            }
+                        }
+                    },
+                    address:{
+                        validators:{
+                            notEmpty:{
+                                message:'地址不能为空'
+                            }
+                        }
+                    }
+
+                }
+            });
+        }
+        $(function (){
+            checkForm();
+        })
+        function resetForm(){
+            document.getElementById("frmloginin").reset();
+            $("#frmloginin").data('bootstrapValidator').destroy();
+            $("#frmloginin").data('bootstrapValidator',null);
+            checkForm();
+        }
         function loginByAccount() {
             //alert(1);
             $.post(
@@ -30,9 +129,6 @@
                         $('#loginModal').modal('hide');
                         //在对应节点加上这个片段
                         $('#navInfo').html(content);
-
-
-
                     }
 
                     //登录失败
@@ -42,7 +138,6 @@
                     }
                 }
             );
-
         }
 
         //退出
@@ -58,6 +153,44 @@
                     }
                 }
             );
+        }
+        function addUser() {
+            //进行表单验证
+            var bv=$('#frmloginin').data('bootstrapValidator');
+            bv.validate();
+            //console.log($('#frmloginin').serialize());
+            //如果校验通过。执行post请求，完成添加动作
+            if(bv.isValid()){
+                $.post(
+                    '${pageContext.request.contextPath}/front/customer/add',
+                    $('#frmloginin').serialize(),
+                    function (result) {
+                        if(result.status==1){
+                            layer.msg(
+                                result.message,
+                                {
+                                    time:2000,
+                                    skin:'successMsg'
+                                }
+                            );
+                            history.go(0);
+                        }
+                        else{
+                            layer.msg(
+                                result.message,
+                                {
+                                    time:2000,
+                                    skin:'errorMsg'
+                                }
+                            );
+                        }
+                    }
+
+                );
+            }
+            else{
+
+            }
         }
 
     </script>
@@ -274,43 +407,49 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="myModalLabel">会员注册</h4>
             </div>
-            <form action="" class="form-horizontal" method="post">
+            <form action="${pageContext.request.contextPath}/front/customer/loginIn" class="form-horizontal" method="post" id="frmloginin">
                 <div class="modal-body">
                     <div class="form-group">
                         <label class="col-sm-3 control-label">用户姓名:</label>
                         <div class="col-sm-6">
-                            <input class="form-control" type="text">
+                            <input class="form-control" type="text" name="cusname">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">登陆账号:</label>
                         <div class="col-sm-6">
-                            <input class="form-control" type="text">
+                            <input class="form-control" type="text" name="loginName">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">登录密码:</label>
                         <div class="col-sm-6">
-                            <input class="form-control" type="password">
+                            <input class="form-control" type="password" name="password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">再次输入登录密码:</label>
+                        <div class="col-sm-6">
+                            <input class="form-control" type="password" name="confirmpassword">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">联系电话:</label>
                         <div class="col-sm-6">
-                            <input class="form-control" type="text">
+                            <input class="form-control" type="text" name="phone">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">联系地址:</label>
                         <div class="col-sm-6">
-                            <input class="form-control" type="text">
+                            <input class="form-control" type="text" name="address">
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-warning" data-dismiss="modal" aria-label="Close">关&nbsp;&nbsp;闭</button>
-                    <button type="reset" class="btn btn-warning">重&nbsp;&nbsp;置</button>
-                    <button type="submit" class="btn btn-warning">注&nbsp;&nbsp;册</button>
+                    <button type="button" id="resetfrm" class="btn btn-warning" onclick="resetForm()">重&nbsp;&nbsp;置</button>
+                    <button type="button" class="btn btn-warning" onclick="addUser()">注&nbsp;&nbsp;册</button>
                 </div>
             </form>
         </div>
