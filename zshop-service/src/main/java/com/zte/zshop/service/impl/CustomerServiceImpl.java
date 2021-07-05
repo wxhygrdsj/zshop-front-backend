@@ -47,6 +47,15 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public boolean checkPsw(String oldpsw,String transname) {
+        Customer customer=customerDao.selectPswByName(oldpsw,transname);
+        if(customer!=null){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public void add(CustomerVO sysuserVO) {
         Customer customer=new Customer();
         try {
@@ -62,5 +71,10 @@ public class CustomerServiceImpl implements CustomerService {
             e.printStackTrace();
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    @Override
+    public void updatePsw(String newpsw, String transname) {
+        customerDao.updatePsw(newpsw,transname);
     }
 }

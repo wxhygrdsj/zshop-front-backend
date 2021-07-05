@@ -14,4 +14,9 @@ public interface CustomerDao {
     public Customer selectByName(String loginName);
 
     public void insert(Customer customer);
+
+    public Customer selectPswByName(@Param("password") String oldpsw,@Param("loginName") String transname);
+
+
+    public void updatePsw(@Param("password") String newpsw, @Param("loginName") String transname);
 }

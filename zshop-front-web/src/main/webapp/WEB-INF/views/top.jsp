@@ -17,6 +17,57 @@
                     $(this).addClass('active');
                 }
             });
+            $('#frmChange').bootstrapValidator({
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok',//成功后输出的图标
+                    invalid: 'glyphicon glyphicon-remove',//失败后输出的图标
+                    validating: 'glyphicon glyphicon-refresh'//长时间加载时输出的图标
+                },
+                fields:{
+                    oldpsw:{
+                        validators: {
+                            notEmpty: {
+                                message: '不能为空'
+                            },
+                            stringLength: {
+                                min: 4,
+                                message: '至少为4位'
+                            },
+                            remote:{
+                                //校验该名称是否已经在数据库中存在
+                                url:'${pageContext.request.contextPath}/front/customer/checkPsw'
+                            }
+                        }
+                    },
+                    newpsw:{
+                        validators: {
+                            notEmpty: {
+                                message: '不能为空'
+                            },
+                            stringLength: {
+                                min: 4,
+                                message: '密码至少为4位'
+                            },
+                            identical: {
+                                field: 'reppsw',
+                                message: '两次输入密码不一致'
+                            }
+                        }
+                    },
+                    reppsw:{
+                        validators:{
+                            notEmpty:{
+                                message:'密码不能为空'
+                            },
+                            identical:{
+                                field: 'newpsw',
+                                message:'两次输入密码不一致'
+                            }
+                        }
+                    }
+                }
+            })
+
             $('#frmloginin').bootstrapValidator({
                 feedbackIcons: {
                     valid: 'glyphicon glyphicon-ok',//成功后输出的图标
@@ -107,12 +158,20 @@
         $(function (){
             checkForm();
         })
-        function resetForm(){
-            document.getElementById("frmloginin").reset();
-            $("#frmloginin").data('bootstrapValidator').destroy();
-            $("#frmloginin").data('bootstrapValidator',null);
+        // function resetForm(){
+        //     document.getElementById("frmloginin").reset();
+        //     $("#frmloginin").data('bootstrapValidator').destroy();
+        //     $("#frmloginin").data('bootstrapValidator',null);
+        //     checkForm();
+        // }
+        function resetForm(formName){
+            document.getElementById(formName).reset();
+            $("#"+formName).data('bootstrapValidator').destroy();
+            $("#"+formName).data('bootstrapValidator',null);
             checkForm();
         }
+
+
         function loginByAccount() {
             //alert(1);
             $.post(
@@ -154,6 +213,43 @@
                 }
             );
         }
+
+        //修改密码
+        function updatePsw(){
+            var bv=$('#frmChange').data('bootstrapValidator');
+            bv.validate();
+            if(bv.isValid()){
+                $.post(
+                    '${pageContext.request.contextPath}/front/customer/updatePsw',
+                    $('#frmChange').serialize(),
+                    function (result) {
+                        if(result.status==1){
+                            layer.msg(
+                                result.message,
+                                {
+                                    time:2000,
+                                    skin:'successMsg'
+                                }
+                            );
+                            history.go(0);
+                        }
+                        else{
+                            layer.msg(
+                                result.message,
+                                {
+                                    time:2000,
+                                    skin:'errorMsg'
+                                }
+                            );
+                        }
+                    }
+                )
+            }else {
+
+            }
+        }
+
+        //注册
         function addUser() {
             //进行表单验证
             var bv=$('#frmloginin').data('bootstrapValidator');
@@ -260,7 +356,7 @@
                         </li>
                     </c:when>
                     <c:otherwise>
-                        <li class="userName">
+                        <li class="userName" id="transname">
                             您好：${customer.name}！
                         </li>
                         <li class="dropdown">
@@ -297,31 +393,31 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="myModalLabel">修改密码</h4>
             </div>
-            <form action="" class="form-horizontal" method="post">
+            <form action="" class="form-horizontal" method="post"  id="frmChange">
                 <div class="modal-body">
                     <div class="form-group">
                         <label class="col-sm-3 control-label">原密码：</label>
                         <div class="col-sm-6">
-                            <input class="form-control" type="password">
+                            <input class="form-control" type="password" name="oldpsw">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">新密码：</label>
                         <div class="col-sm-6">
-                            <input class="form-control" type="password">
+                            <input class="form-control" type="password" name="newpsw">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">重复密码：</label>
                         <div class="col-sm-6">
-                            <input class="form-control" type="password">
+                            <input class="form-control" type="password" name="reppsw">
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-warning" data-dismiss="modal" aria-label="Close">关&nbsp;&nbsp;闭</button>
-                    <button type="reset" class="btn btn-warning">重&nbsp;&nbsp;置</button>
-                    <button type="submit" class="btn btn-warning">修&nbsp;&nbsp;改</button>
+                    <button type="button" class="btn btn-warning" onclick="resetForm('frmChange')">重&nbsp;&nbsp;置</button>
+                    <button type="button" class="btn btn-warning" onclick="updatePsw()">修&nbsp;&nbsp;改</button>
                 </div>
             </form>
         </div>
@@ -448,7 +544,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-warning" data-dismiss="modal" aria-label="Close">关&nbsp;&nbsp;闭</button>
-                    <button type="button" id="resetfrm" class="btn btn-warning" onclick="resetForm()">重&nbsp;&nbsp;置</button>
+                    <button type="button" id="resetfrm" class="btn btn-warning" onclick="resetForm('frmloginin')">重&nbsp;&nbsp;置</button>
                     <button type="button" class="btn btn-warning" onclick="addUser()">注&nbsp;&nbsp;册</button>
                 </div>
             </form>

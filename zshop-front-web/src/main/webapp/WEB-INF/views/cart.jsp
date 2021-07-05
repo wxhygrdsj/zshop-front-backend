@@ -18,6 +18,9 @@
     <script>
         
         $(function () {
+             
+
+
             //使用ajax技术修改单个商品的数量
             $('.text1234').change(function () {
                 //alert(1);
@@ -85,6 +88,7 @@
         function shopping() {
             location.href='${pageContext.request.contextPath}/front/product/main';
         }
+
 
         //显示删除模态框
         function showDelModal(id) {
@@ -168,7 +172,7 @@
     <table class="table table-hover table-striped table-bordered">
         <tr>
             <th>
-                <input type="checkbox" id="all">
+                <input type="checkbox" id="selectAll" name="checkboxAll">
             </th>
             <th>序号</th>
             <th>商品名称</th>
@@ -182,7 +186,7 @@
         <c:forEach items="${sessionScope.shoppingCart.items}" var="item" varStatus="s">
         <tr id="${item.product.id}">
             <td>
-                <input type="checkbox">
+                <input type="checkbox" class="selectSingle" name="checkboxSingle">
             </td>
             <td>${s.count}</td>
             <td>${item.product.name}</td>

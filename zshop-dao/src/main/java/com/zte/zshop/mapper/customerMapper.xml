@@ -39,6 +39,25 @@
 
     </select>
 
+<!--    public void selectPswByName(String oldpsw, String transname);-->
+    <select id="selectPswByName" resultMap="customerMap">
+        SELECT
+            <include refid="customerColumn"/>
+        FROM
+          t_customer
+        where
+          login_name=#{loginName} and password=#{password}
+    </select>
+
+
+<!--    public void updatePsw(String newpsw, String transname);-->
+    <update id="updatePsw">
+       UPDATE t_customer
+        SET PASSWORD = #{password}
+        WHERE
+            login_name = #{loginName}
+    </update>
+
     <!--
     public Customer selectByName(String loginName);
     -->

@@ -16,5 +16,9 @@ public interface CustomerService {
 
     public boolean checkName(String loginName);
 
+    public boolean checkPsw(String oldpsw,String transname);
+
     public void add(CustomerVO sysuserVO);
+
+    public void updatePsw(String newpsw,String transname);
 }

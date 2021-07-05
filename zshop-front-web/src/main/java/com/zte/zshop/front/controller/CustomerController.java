@@ -27,7 +27,6 @@ public class CustomerController {
     private CustomerService customerService;
 
 
-
     @RequestMapping("/loginByAccount")
     @ResponseBody
     public ResponseResult loginByAccount(String loginName, String password, HttpSession session){
@@ -38,6 +37,7 @@ public class CustomerController {
             Customer customer= customerService.login(loginName,password);
 
             session.setAttribute("customer",customer);
+            session.setAttribute("customerName",customer.getLoginName());
             return ResponseResult.success(customer);
         } catch (LoginErrorException e) {
             e.printStackTrace();
@@ -85,10 +85,45 @@ public class CustomerController {
         return map;
     }
 
+    @RequestMapping("/checkPsw")
+    @ResponseBody
+    public Map<String,Object> checkPsw(String oldpsw,HttpSession session){
+        String transname= (String) session.getAttribute("customerName");
+        //System.out.println(oldpsw+transname);
+        Map<String,Object> map = new HashMap<>();
+        boolean res=customerService.checkPsw(oldpsw,transname);
+        //如果名称不存在，可用
+        if(res){
+            map.put("valid",true);
+        }
+        else{
+            map.put("valid",false);
+            map.put("message","密码错误");
+        }
+        return map;
+    }
+
+
+    @RequestMapping("/updatePsw")
+    @ResponseBody
+    public ResponseResult updatePsw(String newpsw,HttpSession session){
+        String transname= (String) session.getAttribute("customerName");
+        //System.out.println(newpsw+transname);
+        try {
+            customerService.updatePsw(newpsw,transname);
+            return ResponseResult.success("修改密码成功");
+        } catch (Exception e) {
+            //e.printStackTrace();
+            return ResponseResult.fail(e.getMessage());
+        }
+
+    }
+
+
+
     @RequestMapping("/add")
     @ResponseBody
     public ResponseResult add(CustomerVO sysuserVO){
-
         try {
             customerService.add(sysuserVO);
             return ResponseResult.success("注册成功");
