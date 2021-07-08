@@ -1,3 +1,10 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: 26615
+  Date: 2021/6/1
+  Time: 12:03
+  To change this template use File | Settings | File Templates.
+--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
@@ -19,49 +26,32 @@
     <script>
         $(function () {
             $('#pagination').bootstrapPaginator({
-                //主版本号
                 bootstrapMajorVersion:3,
-                //当前页
                 currentPage:${data.pageNum},
-                //总页数
                 totalPages:${data.pages},
-                //点击分页条执行的请求url
-                pageUrl:function (type,page,current) {
-                    return '${pageContext.request.contextPath}/backend/productType/findAll?pageNum='+page;
-                    
+                pageUrl: function (type, page, current) {
+                    if(current==page){
+                        return "javascript:void(0)";
+                    }
+                    return "${pageContext.request.contextPath}/backend/productType/findAll?pageNum="+page;
                 },
                 itemTexts: function (type, page, current) {
                     switch (type) {
                         case "first":
-                            return "首页";
+                            return "&lt;&lt;";
                         case "prev":
-                            return "上一页";
+                            return "&lt;";
                         case "next":
-                            return "下一页";
+                            return "&gt;";
                         case "last":
-                            return "尾页";
+                            return "&gt;&gt;";
                         case "page":
                             return page;
-                    }
-                },
-                tooltipTitles: function (type, page, current) {
-
-                    switch (type) {
-                        case "first":
-                            return "去首页";
-                        case "prev":
-                            return "去上一页";
-                        case "next":
-                            return "去下一页";
-                        case "last":
-                            return "去尾页";
-                        case "page":
-                            return (page === current) ? "当前页 " + page : "去页 " + page;
                     }
                 }
 
             });
-        });
+        })
 
         //添加商品类型
         function  addProductType() {
@@ -79,7 +69,8 @@
                                 skin:"successMsg"//窗口样式，样式类来自zshop.css
                             },
                             function () {
-                                location.href="${pageContext.request.contextPath}/backend/productType/findAll?pageNum="+${data.pageNum}
+
+                                location.href="${pageContext.request.contextPath}/backend/productType/findAll?pageNum="+${data.pageNum};
                             }
                         );
                     }
@@ -97,7 +88,6 @@
                 }
             );
         }
-
         //显示修改商品类型窗口
         function  showProductType(id) {
             //alert(id);
@@ -112,14 +102,19 @@
                 }
             );
         }
-
         //修改商品类型名称
         function  modifyName() {
+
+
+
+
+           // console.log($('#name'+id).text());
             $.ajax({
                 type:"post",
                 url:"${pageContext.request.contextPath}/backend/productType/modifyName",
                 data:{"id":$("#proTypeNum").val(),"name":$("#proTypeName").val()},
                 success:function (data) {
+                    console.log(data);
                     if(data.status==1){
                         layer.msg(
                             data.message,
@@ -128,8 +123,17 @@
                                 skin:"successMsg"
                             },
                             function () {
+                                console.log(data.data.name);
                                 //成功后加载当前页面,这个data不是返回值data,是当前列表的data,该data包含了pegeInfo对象
-                                location.href="${pageContext.request.contextPath}/backend/productType/findAll?pageNum="+${data.pageNum}
+                                //$("#proTypeName").val(data.data.name);
+                                //_this.parent().parent().children(0).val(data.data.name);
+                               // let name=$('#tb tr:first td:first').text();
+                               // console.log(name);
+                                //$('#tb').children(0).children(0).val(data.data.name);
+                               /*console.log($(name).text());
+                               console.log($('#name17').text());*/
+                                let id=$('#proTypeNum').val();
+                                $('#name'+id).text(data.data.name);
                             }
                         );
                     }
@@ -188,36 +192,28 @@
             );
         }
 
-        //修改状态
-        function  modifyStatus(id,btn) {
+        function  modifyStatus(id,btn){
             $.post(
                 "${pageContext.request.contextPath}/backend/productType/modifyStatus",
                 {"id":id},
                 function () {
-                    //刷新页面
-                    //location.href="${pageContext.request.contextPath}/backend/productType/findAll?pageNum="+
-                    //        ${data.pageNum};
-
-
-                    //局部刷新
-                    var $td=$(btn).parent().prev();
+                    let $td=$(btn).parent().prev()
                     if($td.text().trim()=='启用'){
                         $td.text('禁用');
                         $(btn).val('启用').removeClass('btn-danger').addClass('btn-success');
-                    }
-                    else{
+
+                    }else if($td.text().trim()=='禁用'){
                         $td.text('启用');
                         $(btn).val('禁用').removeClass('btn-success').addClass('btn-danger');
                     }
 
-
-
                 }
 
-            );
+            )
+
         }
 
-        
+
 
     </script>
 </head>
@@ -232,9 +228,10 @@
         <br>
         <br>
         <div class="show-list text-center">
-            <table class="table table-bordered table-hover" style='text-align: center'>
+            <table class="table table-bordered table-hover" style='text-align: center;'>
                 <thead>
                 <tr class="text-danger">
+
                     <th class="text-center">类型名称</th>
                     <th class="text-center">状态</th>
                     <th class="text-center">操作</th>
@@ -242,31 +239,29 @@
                 </thead>
                 <tbody id="tb">
                 <c:forEach items="${data.list}" var="productType" varStatus="s">
-                <tr>
-                    <td>${productType.name}</td>
-                    <td>
-                        <c:if test="${productType.status==1}">启用</c:if>
-                        <c:if test="${productType.status==0}">禁用</c:if>
-                    </td>
-                    <td class="text-center">
-                        <input type="button" class="btn btn-warning btn-sm doProTypeModify" value="修改"
-                        onclick="showProductType(${productType.id})">
-                        <input type="button" class="btn btn-warning btn-sm doProTypeDelete" value="删除" onclick="showDelModel(${productType.id})">
-                        <c:if test="${productType.status==1}">
-                            <input type="button" class="btn btn-danger btn-sm doProTypeDisable" value="禁用"
-                            onclick="modifyStatus(${productType.id},this)">
+                    <tr>
+                        <td id="name${productType.id}">${productType.name}</td>
+                        <td>
+                            <c:if test="${productType.status==1}">启用</c:if>
+                            <c:if test="${productType.status==0}">禁用</c:if>
+                        </td>
+                        <td class="text-center">
+                            <input type="button" class="btn btn-warning btn-sm doProTypeModify" value="修改" onclick="showProductType(${productType.id})">
+                            <input type="button" class="btn btn-warning btn-sm doProTypeDelete" value="删除" onclick="showDelModel(${productType.id})">
+                            <c:if test="${productType.status==1}">
+                                <input type="button" class="btn btn-danger btn-sm doProTypeDisable" value="禁用" onclick="modifyStatus(${productType.id},this)">
 
-                        </c:if>
-                        <c:if test="${productType.status==0}">
-                            <input type="button" class="btn btn-success btn-sm doProTypeDisable" value="启用"
-                            onclick="modifyStatus(${productType.id},this)">
-                        </c:if>
-                    </td>
-                </tr>
+                            </c:if>
+                            <c:if test="${productType.status==0}">
+                                <input type="button" class="btn btn-success btn-sm doProTypeDisable" value="启用" onclick="modifyStatus(${productType.id},this)">
+
+                            </c:if>
+                        </td>
+                    </tr>
                 </c:forEach>
                 </tbody>
+
             </table>
-            <%--定义分页条，使用bootstap分页控件完成分页逻辑--%>
             <ul id="pagination"></ul>
         </div>
     </div>
@@ -335,7 +330,6 @@
     </div>
 </div>
 <!-- 修改商品类型 end -->
-
 <!-- 删除商品类型 start -->
 <div class="modal fade" tabindex="-1" id="delProductType">
     <!-- 窗口声明 -->
@@ -348,7 +342,7 @@
                 <h4 class="modal-title">提示消息</h4>
             </div>
             <div class="modal-body text-left">
-               <h4>确认要删除该商品类型吗？</h4>
+                <h4>确认要删除该商品类型吗？</h4>
             </div>
             <input type="hidden" id="productTypeId"/>
 

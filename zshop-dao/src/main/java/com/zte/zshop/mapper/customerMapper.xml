@@ -14,13 +14,14 @@
         <result property="address" column="address"/>
         <result property="isValid" column="is_valid"/>
         <result property="registDate" column="regist_date"/>
+        <result property="image" column="image"/>
 
 
     </resultMap>
 
     <sql id="customerColumn">
 
-        id,name,login_name,password,phone,address,is_valid,regist_date
+        id,name,login_name,password,phone,address,is_valid,regist_date,image
     </sql>
 
 
@@ -38,19 +39,62 @@
            login_name=#{loginName} and password=#{password} and is_valid=#{isValid}
 
     </select>
-
-<!--    public void selectPswByName(String oldpsw, String transname);-->
-    <select id="selectPswByName" resultMap="customerMap">
+    <!--
+    public Customer selectById(Integer id);
+    -->
+    <select id="selectById" resultMap="customerMap">
         SELECT
             <include refid="customerColumn"/>
         FROM
-          t_customer
+            t_customer
         where
-          login_name=#{loginName} and password=#{password}
+            id=#{id}
+
+
+    </select>
+    <!--
+    public void update(Customer customer);
+    -->
+    <update id="update" parameterType="customer">
+        UPDATE
+        t_customer
+        SET
+        name=#{name},
+
+        <!--<if test="loginName!=null and loginName!=''">login_name=#{loginName},</if>-->
+        login_name=#{loginName},
+        phone=#{phone},
+        address=#{address}
+        WHERE
+        id=#{id}
+    </update>
+    <!--
+     public void updateImage(Customer customer);
+    -->
+    <update id="updateImage" parameterType="customer">
+        UPDATE
+        t_customer
+        SET
+
+        <if test="image!=null">image=#{image}</if>
+        WHERE
+        id=#{id}
+    </update>
+
+
+
+    <!--    public void selectPswByName(String oldpsw, String transname);-->
+    <select id="selectPswByName" resultMap="customerMap">
+        SELECT
+        <include refid="customerColumn"/>
+        FROM
+        t_customer
+        where
+        login_name=#{loginName} and password=#{password}
     </select>
 
 
-<!--    public void updatePsw(String newpsw, String transname);-->
+    <!--    public void updatePsw(String newpsw, String transname);-->
     <update id="updatePsw">
        UPDATE t_customer
         SET PASSWORD = #{password}
@@ -71,9 +115,9 @@
 
     </select>
 
-<!--    public void insert(Customer customer);-->
+    <!--    public void insert(Customer customer);-->
     <insert id="insert" parameterType="customer">
-        INSERT INTO t_customer ( NAME, login_name, PASSWORD, phone, address, is_valid, regist_date )
+        INSERT INTO t_customer ( NAME, login_name, PASSWORD, phone, address, is_valid, regist_date,image )
 VALUES
 	(
 		#{name},
@@ -82,9 +126,71 @@ VALUES
 		#{phone},
 		#{address},
 	    #{isValid},
-        #{registDate})
+        #{registDate},
+        #{image})
 
     </insert>
+
+
+
+    <!--
+        public List<Customer> selectAll();
+    -->
+    <select id="selectAll" resultMap="customerMap">
+ SELECT
+        <include refid="customerColumn"/>
+    FROM
+      t_customer
+
+
+    </select>
+
+    <!--
+      public List<Customer> selectByParams(CustomerParam customerParam);
+    -->
+    <select id="selectByParams" parameterType="com.zte.zshop.params.CustomerParam" resultMap="customerMap">
+        SELECT
+            <include refid="customerColumn"/>
+        FROM
+        t_customer
+
+        <where>
+            <if test="name!=null and name!=''">
+                and name like concat(concat('%',#{name}),'%')
+
+            </if>
+            <if test="loginName!=null and loginName!=''">
+                and login_name like concat(concat('%',#{loginName}),'%')
+
+            </if>
+            <if test="phone!=null and phone!=''">
+                and phone=#{phone}
+
+            </if>
+            <if test="address!=null and address!=''">
+                and address=#{address}
+
+            </if>
+            <if test="isValid!=null and isValid!=-1">
+                and is_valid=#{isValid}
+
+            </if>
+        </where>
+
+    </select>
+
+    <!--
+    public void updateStatus(@Param("id") Integer id, @Param("isValid") Integer isValid);
+    -->
+    <update id="updateStatus">
+    update
+          t_customer
+        set
+          is_valid=#{isValid}
+        where
+          id=#{id}
+
+    </update>
 
 
 </mapper>

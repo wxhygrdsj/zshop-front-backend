@@ -13,7 +13,7 @@
     <script src="${pageContext.request.contextPath}/layer/layer.js"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/zshop.css"/>
     <script>
-        $(function () {
+        function check(){
             $('#frmLogin').bootstrapValidator({
                 feedbackIcons: {
                     valid: 'glyphicon glyphicon-ok',//成功后输出的图标
@@ -50,6 +50,9 @@
                     }
                 }
             });
+        }
+        $(function () {
+           check();
 
             //服务端校验
             var errorMsg='${errorMsg}';
@@ -63,6 +66,15 @@
                 );
             }
         });
+
+        function resetForm(formName){
+            document.getElementById(formName).reset();
+            $("#"+formName).data('bootstrapValidator').destroy();
+            $("#"+formName).data('bootstrapValidator',null);
+            check();
+        }
+
+
 
         function reloadImage() {
             $('#randImage').attr('src','${pageContext.request.contextPath}/backend/code/image?time='+new Date().getTime());
@@ -117,7 +129,7 @@
                             <button type="submit" class="btn btn-primary btn-block">登&nbsp;&nbsp;陆</button>
                         </div>
                         <div class="col-sm-4">
-                            <button type="reset" class="btn btn-primary btn-block">重&nbsp;&nbsp;置</button>
+                            <button type="button" class="btn btn-primary btn-block"  onclick="resetForm('frmLogin')">重&nbsp;&nbsp;置</button>
                         </div>
                         <div class="col-sm-4">
                             <button type="button" class="btn btn-link btn-block">忘记密码？</button>

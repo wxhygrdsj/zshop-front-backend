@@ -22,14 +22,18 @@ public class Customer implements Serializable {
 
     private String address;
 
+
+
     private Integer isValid;
 
     private Date registDate;
 
+    private String image;
+
     public Customer() {
     }
 
-    public Customer(Integer id, String name, String loginName, String password, String phone, String address, Integer isValid, Date registDate) {
+    public Customer(Integer id, String name, String loginName, String password, String phone, String address, Integer isValid, Date registDate, String image) {
         this.id = id;
         this.name = name;
         this.loginName = loginName;
@@ -38,6 +42,7 @@ public class Customer implements Serializable {
         this.address = address;
         this.isValid = isValid;
         this.registDate = registDate;
+        this.image = image;
     }
 
     public Integer getId() {
@@ -104,17 +109,11 @@ public class Customer implements Serializable {
         this.registDate = registDate;
     }
 
-    @Override
-    public String toString() {
-        return "Customer{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", loginName='" + loginName + '\'' +
-                ", password='" + password + '\'' +
-                ", phone='" + phone + '\'' +
-                ", address='" + address + '\'' +
-                ", isValid=" + isValid +
-                ", registDate=" + registDate +
-                '}';
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

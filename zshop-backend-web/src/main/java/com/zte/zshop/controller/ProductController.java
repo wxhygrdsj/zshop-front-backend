@@ -55,18 +55,18 @@ public class ProductController {
 
 
     @RequestMapping("/findAll")
-    public String findAll(Integer pageNum,Model model){
+    public String findAll(Integer pageNum, Model model){
         if(ObjectUtils.isEmpty(pageNum)){
-            pageNum=Constant.PAGE_NUM;
+            pageNum= Constant.PAGE_NUM;
         }
-        PageInfo<Product> pageInfo= productService.findAll(pageNum,Constant.PAGE_SIZE);
+        PageInfo<Product> pageInfo= productService.findAll(pageNum, Constant.PAGE_SIZE);
         model.addAttribute("data",pageInfo);
         return "productManager";
     }
 
 
     @RequestMapping("/add")
-    public String add(ProductVO productVO, Integer pageNum,HttpSession session,Model model){
+    public String add(ProductVO productVO, Integer pageNum, HttpSession session, Model model){
         //System.out.println(productVO);
         //获取文件上传路径，注意：这个物理路径必须是存在
         //String uploadPath=session.getServletContext().getRealPath("/WEB-INF/upload");
@@ -123,6 +123,7 @@ public class ProductController {
         return ResponseResult.success(product);
     }
 
+
     //在修改窗口显示图片
     @RequestMapping("/showPic")
     public void showPic(String image, OutputStream out)throws IOException {
@@ -134,20 +135,18 @@ public class ProductController {
         byte[] data = new byte[4096];
         int size=0;
         size = is.read(data);
-        while(size!=1){
+        while(size!=-1){
             bos.write(data,0,size);
             size=is.read(data);
         }
         is.close();
         bos.flush();
         bos.close();
-
-
     }
 
     //修改商品
     @RequestMapping("/modify")
-    public String modify(ProductVO productVO,Integer pageNum, HttpSession session,Model model){
+    public String modify(ProductVO productVO, Integer pageNum, HttpSession session, Model model){
         //System.out.println(productVO);
         //获取文件上传路径，注意：这个物理路径必须是存在
         //String uploadPath=session.getServletContext().getRealPath("/WEB-INF/upload");

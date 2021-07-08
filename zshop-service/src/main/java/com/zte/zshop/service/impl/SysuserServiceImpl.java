@@ -36,12 +36,23 @@ public class SysuserServiceImpl implements SysuserService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.SUPPORTS,readOnly = true)
     public Sysuser findById(Integer id) {
-        return null;
+        return sysuserDao.selectById(id);
     }
 
     @Override
     public void modify(SysuserVO sysuserVO) {
+        Sysuser sysuser=new Sysuser();
+        try {
+            PropertyUtils.copyProperties(sysuser,sysuserVO);
+            Role role =new Role();
+            role.setId(sysuserVO.getRoleId());
+            sysuser.setRole(role);
+            sysuserDao.update(sysuser);
+        }catch (Exception e){
+            throw new RuntimeException("aaa"+e.getMessage());
+        }
 
     }
 
@@ -50,7 +61,7 @@ public class SysuserServiceImpl implements SysuserService {
 
         Sysuser sysuser = new Sysuser();
         try {
-            PropertyUtils.copyProperties(sysuser,sysuserVO);//
+            PropertyUtils.copyProperties(sysuser,sysuserVO);
             //默认为有效状态
             sysuser.setIsValid(Constant.SYSUSER_VALID);
             //默认响应时间就是当前时间

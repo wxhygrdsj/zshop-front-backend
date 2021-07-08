@@ -18,11 +18,20 @@
     <script>
         
         $(function () {
-             
+            let customer='${customer.name}'
+            if(customer==''){
+                location.href="${pageContext.request.contextPath}/front/product/main";
+            }
+
+            //全选
+            $("#all").click(function (){
+                var xz=$(this).prop("checked");
+                var ck=$(".selectSingle").prop("checked",xz);
+            })
 
 
             //使用ajax技术修改单个商品的数量
-            $('.text1234').change(function () {
+            $('#cart input[type="text"]').change(function () {
                 //alert(1);
                 var quantityVal=this.value;
                 var reg=/^\d+$/g;
@@ -39,7 +48,7 @@
                 if(!flag){
                     alert('输入的商品数量必须大于0');
                     //将该最近的一次正确值写回文本
-                    $(this).val($(this).attr('class')[0]);
+                    $(this).val($(this).attr('class'));
                     return;
                 }
                 //重新将该数据写回class属性
@@ -84,11 +93,10 @@
             });
 
         });
-        //继续购物
+
         function shopping() {
             location.href='${pageContext.request.contextPath}/front/product/main';
         }
-
 
         //显示删除模态框
         function showDelModal(id) {
@@ -98,11 +106,6 @@
             //显示该模态框
             $('#deleteItemModal').modal('show');
 
-        }
-
-        //结算
-        function settle(){
-            location.href='${pageContext.request.contextPath}/front/product/main';
         }
 
         //删除商品明细
@@ -149,7 +152,121 @@
 
 
         }
+        function clearCart() {
+            $.post(
+                '${pageContext.request.contextPath}/front/product/clearCart',
+                function (result) {
+                    if (result.status == 1) {
+                        layer.msg(
+                            result.message,
+                            {
+                                time: 1000,
+                                skin: 'successMsg'
+                            },
+                            function () {
+                                $('#cart').find('tr[class="cartItem"]').remove();
+                                $('#totalMoney').html('');
+                            }
+                        )
 
+                    }else{
+                        layer.msg(
+                            result.message,
+                            {
+                                time: 1000,
+                                skin: 'errorMsg'
+                            }
+
+                        )
+                    }
+                }
+            );
+
+        }
+
+        function deleteSelected() {
+
+            let ids='';
+            $('input[class="selectSingle"]:checked').each(function (i) {
+                if(i==0){
+                    ids+='ids='+$(this).parent().parent().attr('id');
+                }else{
+                    ids+='&ids='+$(this).parent().parent().attr('id');
+                }
+                console.log(ids);
+            })
+            console.log(ids);
+            $.get(
+                '${pageContext.request.contextPath}/front/product/deleteSelected',
+                ids,
+                function (result) {
+                    if(result.status==1){
+                        layer.msg(
+                            result.message,
+                            {
+                                time: 1000,
+                                skin: 'successMsg'
+                            },
+                            function () {
+                                 history.go(0);
+                            }
+                        )
+                    }else{
+                        layer.msg(
+                            result.message,
+                            {
+                                time: 1000,
+                                skin: 'errorMsg'
+                            }
+
+                        )
+                    }
+
+                }
+
+            )
+
+
+
+
+
+        }
+
+        function settlement() {
+            let ids='';
+            $('input[class="selectSingle"]:not(:checked)').each(function (i) {
+                if(i==0){
+                    ids+='ids='+$(this).parent().parent().attr('id');
+                }else{
+                    ids+='&ids='+$(this).parent().parent().attr('id');
+                }
+            })
+
+            console.log(ids);
+            $.get(
+                '${pageContext.request.contextPath}/front/product/settleSelected',
+                ids,
+                function (result) {
+                    console.log(result);
+                    if(result.status==1){
+                        location.href='${pageContext.request.contextPath}/front/product/toOrder';
+
+                    }else{
+                        layer.msg(
+                            result.message,
+                            {
+                                time: 1000,
+                                skin: 'errorMsg'
+                            }
+
+                        )
+                    }
+
+                }
+
+            )
+
+        }
     </script>
 </head>
 
@@ -169,10 +286,10 @@
             </div>
         </div>
     </div>
-    <table class="table table-hover table-striped table-bordered">
+    <table class="table table-hover table-striped table-bordered" id="cart">
         <tr>
             <th>
-                <input type="checkbox" id="selectAll" name="checkboxAll">
+                <input type="checkbox" id="all">
             </th>
             <th>序号</th>
             <th>商品名称</th>
@@ -184,18 +301,18 @@
             <th>操作</th>
         </tr>
         <c:forEach items="${sessionScope.shoppingCart.items}" var="item" varStatus="s">
-        <tr id="${item.product.id}">
+        <tr id="${item.product.id}" class="cartItem">
             <td>
-                <input type="checkbox" class="selectSingle" name="checkboxSingle">
+                <input type="checkbox" class="selectSingle">
             </td>
             <td>${s.count}</td>
             <td>${item.product.name}</td>
             <td> <img src="${pageContext.request.contextPath}/front/product/showPic?image=${item.product.image}" alt="" width="60" height="60"></td>
             <td>
-                <input type="text" value="${item.quantity}" size="5" class="${item.quantity} text1234" name="${item.product.id}">
+                <input type="text" value="${item.quantity}" size="5" class="${item.quantity}" name="${item.product.id}">
             </td>
-            <td>${item.product.price}</td>
-            <td id="itemMoney_${s.count}"><fmt:formatNumber value="${item.itemMoney}" pattern="#.##"/></td>
+            <td><fmt:formatNumber value="${item.product.price}" pattern="0.00"/></td>
+            <td id="itemMoney_${s.count}"><fmt:formatNumber value="${item.itemMoney}" pattern="0.00"/></td>
             <td>
                 <button class="btn btn-success" type="button"> <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>修改</button>
                 <button class="btn btn-danger" type="button" onclick="showDelModal(${item.product.id})">
@@ -206,18 +323,15 @@
         </c:forEach>
         <tr>
             <td colspan="8" align="right">
-                <button class="btn btn-warning margin-right-15" type="button"> 删除选中项</button>
-                <button class="btn btn-warning  margin-right-15" type="button"> 清空购物车</button>
+                <button class="btn btn-warning margin-right-15" type="button" onclick="deleteSelected()"> 删除选中项</button>
+                <button class="btn btn-warning  margin-right-15" type="button" onclick="clearCart()"> 清空购物车</button>
                 <button class="btn btn-warning margin-right-15" type="button" onclick="shopping()"> 继续购物</button>
-                <button class="btn btn-warning margin-right-15" type="button" onclick="settle()"> 结算</button>
-<%--                <a href="">--%>
-<%--                    <button class="btn btn-warning " type="button"> 结算</button>--%>
-<%--                </a>--%>
+                <button class="btn btn-warning " type="button" onclick="settlement()"> 结算</button>
             </td>
         </tr>
         <tr>
             <td colspan="8" align="right" class="foot-msg">
-                总计： <b><span id="totalMoney">${shoppingCart.totalMoney}</span> </b>元
+                总计： <b><span id="totalMoney"><fmt:formatNumber value="${shoppingCart.totalMoney}" pattern="0.00"/></span> </b>元
             </td>
         </tr>
     </table>

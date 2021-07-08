@@ -55,5 +55,11 @@ public class ShoppingCartItem {
         return product.getPrice()*this.quantity;
     }
 
-
+    @Override
+    public String toString() {
+        return "ShoppingCartItem{" +
+                "product=" + product +
+                ", quantity=" + quantity +
+                '}';
+    }
 }

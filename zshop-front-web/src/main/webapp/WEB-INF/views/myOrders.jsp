@@ -1,3 +1,5 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="zh">
@@ -11,6 +13,50 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css" />
     <script src="${pageContext.request.contextPath}/js/jquery.min.js"></script>
     <script src="${pageContext.request.contextPath}/js/bootstrap.js"></script>
+    <script src="${pageContext.request.contextPath}/layer/layer.js"></script>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/zshop.css"/>
+    <script>
+        $(function () {
+            let customer='${customer.name}'
+            if(customer==''){
+                location.href="${pageContext.request.contextPath}/front/product/main";
+            }
+
+        })
+        function deleteOrder(id) {
+            $.post(
+                '${pageContext.request.contextPath}/front/order/removeOrder',
+                {'id':id},
+                function (result) {
+                    if(result.status==1){
+                        layer.msg(
+                            result.message,
+                            {
+                                time:2000,
+                                skin:'successMsg'
+                            },
+                            function () {
+                                history.go(0);
+                            }
+
+                        )
+                    }else{
+                        layer.msg(
+                            result.message,
+                            {
+                                time:2000,
+                                skin:'errorMsg'
+                            }
+                        )
+                    }
+
+                }
+
+            );
+
+
+        }
+    </script>
 </head>
 
 <body>
@@ -30,106 +76,41 @@
         </div>
     </div>
     <table class="table table-hover   orderDetail">
+        <c:forEach items="${orderList}" var="order">
         <tr>
             <td colspan="5">
-                <span>订单编号：<a href="orderDetail.html">4722456552315</a></span>
-                <span>成交时间：2017-01-01  11:58:49</span>
+                <span>订单编号：<a href="${pageContext.request.contextPath}/front/order/toOrderDetail?id=${order.id}">${order.no}</a></span>
+                <span>成交时间：<fmt:formatDate value="${order.createDate}"  type="both"></fmt:formatDate></span>
             </td>
         </tr>
+        <c:forEach items="${order.orderItemList}" var="orderItem">
         <tr>
-            <td><img src="images/shop1.jpg" alt=""></td>
+            <td><img src="${pageContext.request.contextPath}/front/product/showPic?image=${orderItem.product.image}" alt=""></td>
             <td class="order-content">
                 <p>
-                    秋冬韩版轮廓型宽松连帽套头学生百搭毛呢卫衣+休闲裤两件套装
+                    ${orderItem.product.name}
                 </p>
                 <p>颜色：单件粉色上衣</p>
                 <p>尺码：s</p>
             </td>
             <td>
-                ￥180.00
+                ￥<fmt:formatNumber value="${orderItem.product.price}" pattern="0.00"/>
             </td>
             <td>
-                2
+                ${orderItem.num}
             </td>
             <td class="text-color">
-                ￥360.00
+                ￥<fmt:formatNumber value="${orderItem.price}" pattern="0.00"/>
             </td>
         </tr>
+        </c:forEach>
         <tr>
-            <td><img src="images/shop2.jpg" alt=""></td>
-            <td class="order-content">
-                <p>
-                    秋冬韩版轮廓型宽松连帽套头学生百搭毛呢卫衣+休闲裤两件套装
-                </p>
-                <p>颜色：单件粉色上衣</p>
-                <p>尺码：s</p>
-            </td>
-            <td>
-                ￥60.00
-            </td>
-            <td>
-                2
-            </td>
-            <td class="text-color">
-                ￥60.00
-            </td>
+        <td colspan="5">
+            <span class="pull-right"><button class="btn btn-danger" onclick="deleteOrder('${order.id}')">删除订单</button></span>
+            <span class="">总计:<span class="text-color">￥<fmt:formatNumber value="${order.price}" pattern="0.00"/></span></span>
+        </td>
         </tr>
-        <tr>
-            <td colspan="5">
-                <span class="pull-right"><button class="btn btn-danger">删除订单</button></span>
-                <span class="">总计:<span class="text-color">￥420.00</span></span>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="5">
-                <span>订单编号：<a href="orderDetail.html">4722456552315</a></span>
-                <span>成交时间：2017-01-01  11:58:49</span>
-            </td>
-        </tr>
-        <tr>
-            <td><img src="images/shop1.jpg" alt=""></td>
-            <td class="order-content">
-                <p>
-                    秋冬韩版轮廓型宽松连帽套头学生百搭毛呢卫衣+休闲裤两件套装
-                </p>
-                <p>颜色：单件粉色上衣</p>
-                <p>尺码：s</p>
-            </td>
-            <td>
-                ￥180.00
-            </td>
-            <td>
-                2
-            </td>
-            <td class="text-color">
-                ￥360.00
-            </td>
-        </tr>
-        <tr>
-            <td><img src="images/shop2.jpg" alt=""></td>
-            <td class="order-content">
-                <p>
-                    秋冬韩版轮廓型宽松连帽套头学生百搭毛呢卫衣+休闲裤两件套装
-                </p>
-                <p>颜色：单件粉色上衣</p>
-                <p>尺码：s</p>
-            </td>
-            <td>
-                ￥60.00
-            </td>
-            <td>
-                2
-            </td>
-            <td class="text-color">
-                ￥60.00
-            </td>
-        </tr>
-        <tr>
-            <td colspan="5">
-                <span class="pull-right"><button class="btn btn-danger">删除订单</button></span>
-                <span class="">总计:<span class="text-color">￥420.00</span></span>
-            </td>
-        </tr>
+        </c:forEach>
     </table>
 </div>
 <!-- content end-->

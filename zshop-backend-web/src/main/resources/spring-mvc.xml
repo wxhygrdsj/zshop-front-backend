@@ -32,7 +32,7 @@
 
     <!--访问web-inf下的页面-->
     <mvc:view-controller path="/showLogin" view-name="login"/>
-
+    <!--<mvc:view-controller path="/backend/showProductType" view-name="productTypeManager2"/>-->
 
     <!--访问静态资源-->
     <mvc:default-servlet-handler/>

@@ -139,7 +139,8 @@
                         validators: {
                             notEmpty: {
                                 message: '商品名称不能为空'
-                            }
+                            },
+
                         }
                     },
                     price:{
@@ -154,6 +155,7 @@
                             }
                         }
                     },
+
                     productTypeId:{
                         validators:{
                             notEmpty:{

@@ -7,6 +7,7 @@
         <groupId>com.zte.zshop</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>zshop-front-web</artifactId>
@@ -27,7 +28,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
-
         <!-- servlet jstl -->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -69,7 +69,12 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <!--关联service模块  end-->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+        </dependency>
     </dependencies>
+
 
     <build>
         <plugins>

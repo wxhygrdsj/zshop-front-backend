@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="zh">
@@ -54,34 +55,45 @@
 
         //加入购物车
         function  addToCart(id) {
-
-
-
             //alert(id);
-            $.post(
-                '${pageContext.request.contextPath}/front/product/addToCart',
-                {"id":id},
-                function (result) {
-                    if(result.status==1){
+            let customerName='${customer.name}';
+            console.log(customerName);
+            if(customerName!=''){
+                $.post(
+                    '${pageContext.request.contextPath}/front/product/addToCart',
+                    {"id":id},
+                    function (result) {
+                        if(result.status==1){
 
-                        layer.msg(result.message,
-                            {
-                                time:2000,
-                                skin:'successMsg'
-                            },
-                        function () {
-                            //返回哪一个页面
-                        });
-                    }
-                    else{
-                        layer.msg(result.message,
-                            {
-                                time:2000,
-                                skin:'errorMsg'
+                            layer.msg(result.message,
+                                {
+                                    time:2000,
+                                    skin:'successMsg'
+                                },
+                            function () {
+                                //返回哪一个页面
                             });
+                        }
+                        else{
+                            layer.msg(result.message,
+                                {
+                                    time:2000,
+                                    skin:'errorMsg'
+                                });
+                        }
                     }
-                }
-            );
+                );
+            }else{
+                layer.msg('请先登陆',
+                    {
+                        time:2000,
+                        skin:'errorMsg'
+                    },
+                    function () {
+                            $('#loginModal').modal('show');
+
+                    });
+            }
         }
         
     </script>
@@ -149,9 +161,9 @@
                                 </div>
                                 <h4><a href="">${product.name}</a></h4>
                                 <div class="user clearfix pull-right">
-                                    ￥${product.price}
+                                    ￥<fmt:formatNumber value="${product.price}" pattern="0.00"/>
                                 </div>
-                                <div class="desc">${product.info}
+                                <div class="desc">平时穿也不会显得夸张，很大方洋气 我已经自留了，还和小姐妹准备人手一件圣诞节穿着出去玩！ 经典的圆领，大气休闲，长袖设计，休闲舒适 宽松的版型，怕冷可以里面穿保暖衣）
                                 </div>
                                 <div class="attention pull-right" onclick="addToCart(${product.id})">
                                     加入购物车 <i class="icon iconfont icon-gouwuche"></i>

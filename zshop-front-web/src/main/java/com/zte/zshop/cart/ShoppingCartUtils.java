@@ -23,4 +23,14 @@ public class ShoppingCartUtils {
        return sc;
 
     }
+    public static ShoppingCart getShoppingCart2(HttpSession session){
+        ShoppingCart sc= (ShoppingCart) session.getAttribute("shoppingCart2");
+        if(sc==null){
+            sc = new ShoppingCart();
+            session.setAttribute("shoppingCart2",sc);
+        }
+        return sc;
+
+    }
+
 }

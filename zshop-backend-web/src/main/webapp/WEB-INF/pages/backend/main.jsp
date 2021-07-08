@@ -21,13 +21,32 @@
                 $("#frame-id").attr("src", "${pageContext.request.contextPath}/backend/product/findAll");
             });
             $("#user-set").click(function() {
-                $("#frame-id").attr("src", "customerManager.html");
+                $("#frame-id").attr("src", "${pageContext.request.contextPath}/backend/customer/findAll");
             });
             $("#manager-set").click(function() {
                 $("#frame-id").attr("src", "${pageContext.request.contextPath}/backend/sysuser/findAll");
             });
         });
+        window.onload = function() {
+            var test = document.querySelector(".exit");
+            test.onmouseover = function () {
+                test.style.color = "blue";
+            }
+            //鼠标离开的时候div恢复了以前的颜色
+            test.onmouseleave = function () {
+                test.style.color = "";
+            }
+        }
+
+        function loginOut() {
+            location.href='${pageContext.request.contextPath}/backend/sysuser/returnlogin';
+        }
     </script>
+    <style>
+        .exit{
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
@@ -39,8 +58,8 @@
                 <p>在线商城<span>后台管理系统</span></p>
                 <div class="welcome">
                     <div class="left">欢迎您：</div>
-                    <div class="right">xxx</div>
-                    <div class="exit">退出</div>
+                    <div class="right">${sysuser.name}</div>
+                    <div class="exit" onclick="window.parent.location='${pageContext.request.contextPath}/backend/sysuser/returnlogin'">退出</div>
                 </div>
             </div>
         </div>

@@ -2,12 +2,16 @@ package com.zte.zshop.front.controller;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.gson.Gson;
 import com.zte.zshop.cart.ShoppingCart;
 import com.zte.zshop.cart.ShoppingCartUtils;
 import com.zte.zshop.constants.Constant;
+import com.zte.zshop.entity.Order;
 import com.zte.zshop.entity.Product;
 import com.zte.zshop.entity.ProductType;
 import com.zte.zshop.params.ProductParams;
+import com.zte.zshop.service.CustomerService;
+import com.zte.zshop.service.OrderService;
 import com.zte.zshop.service.ProductService;
 import com.zte.zshop.service.ProductTypeService;
 import com.zte.zshop.utils.ResponseResult;
@@ -26,6 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +49,10 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+    @Autowired
+    private CustomerService customerService;
+    @Autowired
+    private OrderService orderService;
 
     @ModelAttribute("productTypes")
     public List<ProductType> loadProductTypes(){
@@ -52,6 +61,7 @@ public class ProductController {
         return productTypes;
 
     }
+
 
     @RequestMapping("/main")
     public String main(ProductParams productParams,Integer pageNum, Model model){
@@ -93,18 +103,28 @@ public class ProductController {
 
     @RequestMapping("/toCart")
     public String toCart(){
+
         return "cart";
     }
 
-    @RequestMapping("/toOrders")
-    public String toOrders(){
+    @RequestMapping("/toMyOrders")
+    public String toMyOrders(Model model,Integer id){
+        //System.out.println(id);
+        List<Order> orderList=orderService.findAllOrderByCustomerId(id);
+        model.addAttribute("orderList",orderList);
         return "myOrders";
     }
+
     @RequestMapping("/toCenter")
     public String toCenter(){
+
         return "center";
     }
 
+    @RequestMapping("/toOrder")
+    public String toOrder(){
+        return "order";
+    }
     //添加购物车
     @RequestMapping("/addToCart")
     @ResponseBody
@@ -130,7 +150,7 @@ public class ProductController {
             return ResponseResult.fail("购物车已空");
         }
         //重新计算商品总价
-        float totalMoney = sc.getTotalMoney();
+        double totalMoney = sc.getTotalMoney();
         return ResponseResult.success(totalMoney);
 
     }
@@ -146,6 +166,89 @@ public class ProductController {
         result.put("itemMoney",sc.getProducts().get(id).getItemMoney());
         result.put("totalMoney",sc.getTotalMoney());
         return result;
+
+    }
+    //清空购物车
+    @RequestMapping("/clearCart")
+    @ResponseBody
+    public ResponseResult clearCart(HttpSession session){
+        ShoppingCart sc = ShoppingCartUtils.getShoppingCart(session);
+        if(sc.isEmpty()){
+            return ResponseResult.fail("购物车已经为空");
+        }
+        session.removeAttribute("shoppingCart");
+        return ResponseResult.success("清空购物车成功");
+
+    }
+    @RequestMapping("/deleteSelected")
+    @ResponseBody
+    public ResponseResult deleteSelected(HttpSession session, Integer[]ids){
+
+        ShoppingCart sc = ShoppingCartUtils.getShoppingCart(session);
+        if(sc.isEmpty()){
+            return ResponseResult.fail("购物车已经为空");
+        }
+        if(ids==null){
+            return ResponseResult.fail("请勾选删除项");
+        }else {
+            for(Integer id:ids){
+                sc.removeItem(id);
+            }
+            //session.setAttribute("shoppingCart",sc);
+            if(sc.getTotalMoney()==0){
+                return ResponseResult.success("0.00");
+            }
+            DecimalFormat df = new DecimalFormat("#.00");
+
+            return ResponseResult.success(df.format(sc.getTotalMoney()));
+        }
+
+
+    }
+    @RequestMapping("/settleSelected")
+    @ResponseBody
+    public ResponseResult settleSelected(HttpSession session, Integer[]ids) throws CloneNotSupportedException {
+
+        ShoppingCart sc=new ShoppingCart();
+        sc = ShoppingCartUtils.getShoppingCart(session);
+
+        //ShoppingCart sc2= new ShoppingCart();
+        ///sc2.setProducts(sc.getProducts());
+        Gson gson=new Gson();
+        ShoppingCart sc2=gson.fromJson(gson.toJson(sc),ShoppingCart.class);
+
+        try {
+            //PropertyUtils.copyProperties(sc2,sc);
+            //id 是未被选中的
+            //System.out.println("sc2:"+sc2);
+            if (ids != null) {
+                for(Integer id:ids){
+                    System.out.println("ids:"+id);
+                    sc2.removeItem(id);    //结算，留下选中的,ids 传的是未被选中的，移除
+                }
+            }
+
+            if(sc2.isEmpty()){
+                return ResponseResult.fail("请勾选结算项");
+
+            }
+            System.out.println("sc2:"+sc2);
+            session.setAttribute("shoppingCart2",sc2);
+            ShoppingCart k=(ShoppingCart)session.getAttribute("shoppingCart2");
+            System.out.println("k:"+k);
+        } catch (Exception e) {
+            //e.printStackTrace();
+        }
+       /* System.out.println("移除选中ids2之前的sc:"+sc);*/
+
+        /*for(Integer id:ids2){
+            System.out.println("ids2:"+id);
+            sc.removeItem(id);
+        }
+        System.out.println("sc:"+sc);*/
+            //session.setAttribute("shoppingCart",sc);
+
+        return ResponseResult.success("成功");
 
     }
 

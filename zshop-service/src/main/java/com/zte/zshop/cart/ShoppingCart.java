@@ -65,8 +65,8 @@ public class ShoppingCart {
     }
 
     //获取购物车中所有商品的总价
-    public float getTotalMoney(){
-        float total=0;
+    public double getTotalMoney(){
+        double total=0;
         for (ShoppingCartItem sci:getItems()){
             total+=sci.getItemMoney();
         }
@@ -92,7 +92,10 @@ public class ShoppingCart {
         }
     }
 
-
-
-
+    @Override
+    public String toString() {
+        return "ShoppingCart{" +
+                "products=" + products +
+                '}';
+    }
 }

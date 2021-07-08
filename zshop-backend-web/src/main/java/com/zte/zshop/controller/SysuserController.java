@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +46,7 @@ public class SysuserController {
     }
 
     @RequestMapping("/login")
-    public String login(String loginName, String password, HttpSession session,Model model){
+    public String login(String loginName, String password, HttpSession session, Model model){
 
         //完成登录逻辑
         try {
@@ -63,7 +64,7 @@ public class SysuserController {
     }
 
     @RequestMapping("/findAll")
-    public String findAll(Integer pageNum,Model model){
+    public String findAll(Integer pageNum, Model model){
         if(ObjectUtils.isEmpty(pageNum)){
             pageNum= Constant.PAGE_NUM;
         }
@@ -101,15 +102,18 @@ public class SysuserController {
             map.put("valid",false);
             map.put("message","账号【"+loginName+"】已经存在");
         }
+
+
+
         return map;
     }
 
     //组合查询
     @RequestMapping("/findByParams")
-    public String findByParams(SysuserParam sysuserParam,Integer pageNum,Model model){
+    public String findByParams(SysuserParam sysuserParam, Integer pageNum, Model model){
 
         if(ObjectUtils.isEmpty(pageNum)){
-            pageNum=Constant.PAGE_NUM;
+            pageNum= Constant.PAGE_NUM;
         }
         PageHelper.startPage(pageNum,2);
         List<Sysuser> sysusers= sysuserService.findByParams(sysuserParam);
@@ -130,6 +134,34 @@ public class SysuserController {
             e.printStackTrace();
             return ResponseResult.fail("更新失败");
         }
+    }
+
+    @RequestMapping("/findById")
+    @ResponseBody
+    public ResponseResult findById(Integer id){
+        Sysuser sysuser= sysuserService.findById(id);
+        return ResponseResult.success(sysuser);
+
+    }
+
+    @RequestMapping("/modify")
+    public String modify(SysuserVO sysuserVO,Integer pageNum,Model model){
+
+        try {
+
+            sysuserService.modify(sysuserVO);
+            model.addAttribute("successMsg","修改成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("errorMsg","修改失败");
+        }
+        return "forward:findAll?pageNum="+pageNum;
+    }
+
+    @RequestMapping("/returnlogin")
+    public String returnlog(HttpSession session){
+        session.removeAttribute("sysuser");
+        return "login";
     }
 
 

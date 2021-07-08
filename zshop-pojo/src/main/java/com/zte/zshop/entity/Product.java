@@ -82,4 +82,16 @@ public class Product implements Serializable {
     public void setProductType(ProductType productType) {
         this.productType = productType;
     }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", info='" + info + '\'' +
+                ", image='" + image + '\'' +
+                ", productType=" + productType +
+                '}';
+    }
 }

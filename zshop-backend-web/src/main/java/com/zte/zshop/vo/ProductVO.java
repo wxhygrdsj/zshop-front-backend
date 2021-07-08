@@ -18,9 +18,6 @@ public class ProductVO {
 
     private CommonsMultipartFile file;
 
-
-
-
     private Integer productTypeId;
 
     public ProductVO() {

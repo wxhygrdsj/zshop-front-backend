@@ -22,7 +22,6 @@
     </bean>
     <!--配置数据源属性文件-->
     <!--<context:property-placeholder location="classpath:datasource.properties"/>-->
-    <!--<context:property-placeholder location="classpath:ftp.properties"/>-->
 
     <!--配置数据源-->
     <bean id="ds" class="org.apache.commons.dbcp.BasicDataSource">
@@ -44,6 +43,12 @@
         <!--指定别名包-->
         <property name="typeAliasesPackage" value="com.zte.zshop.entity"/>
         <!--注册mapper映射文件-->
+        <!-- <property name="mapperLocations">
+            <array>
+                <value>classpath:com/zte/zshop/mapper/*Mapper.xml</value>
+            </array>
+
+        </property>-->
         <property name="mapperLocations" value="classpath:com/zte/zshop/mapper/*Mapper.xml"/>
         <!--mybatis分页插件-->
         <property name="plugins">
@@ -52,7 +57,7 @@
                     <property name="properties">
                         <props>
                             <prop key="helperDialect">mysql</prop>
-                            
+
                         </props>
 
                     </property>

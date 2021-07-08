@@ -27,10 +27,10 @@ public class ProductTypeController {
     private ProductTypeService productTypeService;
 
     @RequestMapping("/findAll")
-    public String findAll(Integer pageNum,Model model){
+    public String findAll(Integer pageNum, Model model){
 
         if(ObjectUtils.isEmpty(pageNum)){
-            pageNum=Constant.PAGE_NUM;
+            pageNum= Constant.PAGE_NUM;
         }
         //完成查询列表逻辑
         PageInfo<ProductType> pageInfo = productTypeService.findAll(pageNum, Constant.PAGE_SIZE);
@@ -70,7 +70,7 @@ public class ProductTypeController {
 
     @RequestMapping("/modifyName")
     @ResponseBody
-    public ResponseResult modifyName(Integer id,String name){
+    public ResponseResult modifyName(Integer id, String name){
         try {
             productTypeService.modifyName(id,name);
             return ResponseResult.success("修改商品类型成功");

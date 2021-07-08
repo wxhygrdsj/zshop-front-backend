@@ -4,7 +4,6 @@
 <head>
     <title></title>
     <script src="${pageContext.request.contextPath}/js/template.js"></script>
-<%--    <script src="${pageContext.request.contextPath}/js/jquery.js"></script>--%>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrapValidator.min.css"/>
     <script src="${pageContext.request.contextPath}/js/bootstrapValidator.min.js"></script>
     <script src="${pageContext.request.contextPath}/layer/layer.js"></script>
@@ -48,10 +47,7 @@
                                 min: 4,
                                 message: '密码至少为4位'
                             },
-                            identical: {
-                                field: 'reppsw',
-                                message: '两次输入密码不一致'
-                            }
+
                         }
                     },
                     reppsw:{
@@ -67,7 +63,6 @@
                     }
                 }
             })
-
             $('#frmloginin').bootstrapValidator({
                 feedbackIcons: {
                     valid: 'glyphicon glyphicon-ok',//成功后输出的图标
@@ -75,15 +70,15 @@
                     validating: 'glyphicon glyphicon-refresh'//长时间加载时输出的图标
                 },
                 fields:{
-                    cusname: {
+                    name: {
                         validators: {
                             notEmpty: {
                                 message: '用户名不能为空'
                             },
                             stringLength:{
-                                min:4,
+                                min:2,
                                 max:12,
-                                message:'用户名长度必须在4-12位之间'
+                                message:'用户名长度必须在2-12位之间'
                             }
                         }
                     },
@@ -113,13 +108,10 @@
                                 message:'密码至少为4位'
                             },
                             different:{
-                                field:'login_name',
+                                field:'loginName',
                                 message:'密码不能和登录名相同'
-                            },
-                            identical:{
-                                field: 'confirmpassword',
-                                message:'两次输入密码不一致'
                             }
+
                         }
                     },
                     confirmpassword:{
@@ -140,7 +132,7 @@
                             },
                             regexp:{
                                 regexp: /^1\d{10}$/,
-                                message:'手机号格式错误'
+                                message:'手机号格式错误:1开头,11位'
                             }
                         }
                     },
@@ -158,20 +150,25 @@
         $(function (){
             checkForm();
         })
-        // function resetForm(){
-        //     document.getElementById("frmloginin").reset();
-        //     $("#frmloginin").data('bootstrapValidator').destroy();
-        //     $("#frmloginin").data('bootstrapValidator',null);
-        //     checkForm();
-        // }
+        $(function (){
+            let customer='${customer.name}'
+            if(customer=='') {
+                $("#myorders").removeAttr("href");
+                $("#myCart").removeAttr("href");
+                $("#myCenter").removeAttr("href");
+                //$('#loginModal').modal('show');
+            }else {
+                $("#myorders").attr("href","${pageContext.request.contextPath}/front/product/toMyOrders?id=${customer.id}");
+                $("#myCart").attr("href","${pageContext.request.contextPath}/front/product/toCart");
+                $("#myCenter").attr("href","${pageContext.request.contextPath}/front/product/toCenter");
+            }
+        })
         function resetForm(formName){
             document.getElementById(formName).reset();
             $("#"+formName).data('bootstrapValidator').destroy();
             $("#"+formName).data('bootstrapValidator',null);
             checkForm();
         }
-
-
         function loginByAccount() {
             //alert(1);
             $.post(
@@ -183,6 +180,7 @@
                         //返回到主页面(全局刷新)
                         //location.href='${pageContext.request.contextPath}/front/product/main';
                         //通过template引擎获取整个html片段
+                        history.go(0);
                         var content=template('welcome',result.data);
                         //登录窗口关闭
                         $('#loginModal').modal('hide');
@@ -197,6 +195,7 @@
                     }
                 }
             );
+
         }
 
         //退出
@@ -206,13 +205,14 @@
                 function (result) {
                     if(result.status==1){
                         //刷新整体页面
-                        //location.href='${pageContext.request.contextPath}/front/product/main';
+                        location.href='${pageContext.request.contextPath}/front/product/main';
                         var content=template('loginOut');
                         $('#navInfo').html(content);
                     }
                 }
             );
         }
+
 
         //修改密码
         function updatePsw(){
@@ -229,9 +229,13 @@
                                 {
                                     time:2000,
                                     skin:'successMsg'
+                                },
+                                function () {
+                                    history.go(0);
+
                                 }
                             );
-                            history.go(0);
+
                         }
                         else{
                             layer.msg(
@@ -267,9 +271,12 @@
                                 {
                                     time:2000,
                                     skin:'successMsg'
+                                },function () {
+                                    history.go(0);
+
                                 }
                             );
-                            history.go(0);
+
                         }
                         else{
                             layer.msg(
@@ -296,7 +303,7 @@
         </li>
         <li class="dropdown">
             <a href="#" class="dropdown-toggle user-active" data-toggle="dropdown" role="button">
-                <img class="img-circle" src="${pageContext.request.contextPath}/images/user.jpeg" height="30" />
+                <img class="img-circle" src="${pageContext.request.contextPath}/front/customer/getPic?image={{image}}" height="30" />
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
@@ -334,13 +341,13 @@
                     <a href="${pageContext.request.contextPath}/front/product/main">商城主页</a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/front/product/toOrders">我的订单</a>
+                    <a href="${pageContext.request.contextPath}/front/product/toMyOrders?id=${customer.id}" id="myorders">我的订单</a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/front/product/toCart">购物车</a>
+                    <a href="${pageContext.request.contextPath}/front/product/toCart" id="myCart">购物车</a>
                 </li>
                 <li class="dropdown">
-                    <a href="${pageContext.request.contextPath}/front/product/toCenter">会员中心</a>
+                    <a href="${pageContext.request.contextPath}/front/product/toCenter" id="myCenter">会员中心</a>
                 </li>
             </ul>
             <ul class="nav navbar-nav navbar-right" id="navInfo">
@@ -356,12 +363,17 @@
                         </li>
                     </c:when>
                     <c:otherwise>
-                        <li class="userName" id="transname">
+                        <li class="userName">
                             您好：${customer.name}！
                         </li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle user-active" data-toggle="dropdown" role="button">
+                                <c:if test="${customer.image==''}">
                                 <img class="img-circle" src="${pageContext.request.contextPath}/images/user.jpeg" height="30" />
+                                </c:if>
+                                <c:if test="${customer.image!=null}">
+                                    <img class="img-circle" src="${pageContext.request.contextPath}/front/customer/getPic?image=${customer.image}" height="30" />
+                                </c:if>
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
@@ -393,7 +405,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="myModalLabel">修改密码</h4>
             </div>
-            <form action="" class="form-horizontal" method="post"  id="frmChange">
+            <form action="" class="form-horizontal" method="post" id="frmChange">
                 <div class="modal-body">
                     <div class="form-group">
                         <label class="col-sm-3 control-label">原密码：</label>
@@ -417,7 +429,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-warning" data-dismiss="modal" aria-label="Close">关&nbsp;&nbsp;闭</button>
                     <button type="button" class="btn btn-warning" onclick="resetForm('frmChange')">重&nbsp;&nbsp;置</button>
-                    <button type="button" class="btn btn-warning" onclick="updatePsw()">修&nbsp;&nbsp;改</button>
+                    <button type="button" class="btn btn-warning"  onclick="updatePsw()">修&nbsp;&nbsp;改</button>
                 </div>
             </form>
         </div>
@@ -503,12 +515,12 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="myModalLabel">会员注册</h4>
             </div>
-            <form action="${pageContext.request.contextPath}/front/customer/loginIn" class="form-horizontal" method="post" id="frmloginin">
+            <form action="" class="form-horizontal" method="post" id="frmloginin">
                 <div class="modal-body">
                     <div class="form-group">
                         <label class="col-sm-3 control-label">用户姓名:</label>
                         <div class="col-sm-6">
-                            <input class="form-control" type="text" name="cusname">
+                            <input class="form-control" type="text" name="name">
                         </div>
                     </div>
                     <div class="form-group">
@@ -544,7 +556,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-warning" data-dismiss="modal" aria-label="Close">关&nbsp;&nbsp;闭</button>
-                    <button type="button" id="resetfrm" class="btn btn-warning" onclick="resetForm('frmloginin')">重&nbsp;&nbsp;置</button>
+                    <button type="button"  id="resetfrm" class="btn btn-warning" onclick="resetForm('frmloginin')">重&nbsp;&nbsp;置</button>
                     <button type="button" class="btn btn-warning" onclick="addUser()">注&nbsp;&nbsp;册</button>
                 </div>
             </form>

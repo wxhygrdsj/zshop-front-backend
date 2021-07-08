@@ -12,7 +12,7 @@ public class Constant {
 
 
     //每页显示的条数,默认5条
-    public static final int PAGE_SIZE=3;
+    public static final int PAGE_SIZE=5;
 
     //响应状态码:1--成功
     public static final  int RESPONSE_STATUS_SUCCESS=1;

@@ -27,5 +27,5 @@ public interface SysuserDao {
 
     public List<Sysuser> selectByParams(SysuserParam sysuserParam);
 
-    public Sysuser selectByLoginNameAndPass(@Param("loginName") String loginName, @Param("password") String password,@Param("isValid") int sysuserValid);
+    public Sysuser selectByLoginNameAndPass(@Param("loginName") String loginName, @Param("password") String password, @Param("isValid") int sysuserValid);
 }
